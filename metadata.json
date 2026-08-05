@@ -1,0 +1,6 @@
+{
+  "name": "Image to Gemini Prompt Generator",
+  "description": "Upload an image, optionally crop it, and generate a highly detailed text prompt using Gemini to recreate or describe the image.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

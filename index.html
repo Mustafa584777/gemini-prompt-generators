@@ -1,0 +1,2398 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image to Gemini Prompt Generator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Complete, highly optimized custom CSS styling compiled locally inside style tag -->
+    <style>
+      /* Reset & Base Setup */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      :root {
+        --bg-main: #09090b;
+        --bg-card: rgba(24, 24, 27, 0.5);
+        --bg-inner: #18181b;
+        --border-color: rgba(39, 39, 42, 0.8);
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --text-muted: #71717a;
+        --accent: #128c7e;
+        --accent-hover: #25d366;
+        --accent-light: rgba(37, 211, 102, 0.1);
+        --emerald: #25d366;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+
+      html.light-mode {
+        --bg-main: #f9fafb;
+        --bg-card: rgba(243, 244, 246, 0.65);
+        --bg-inner: #ffffff;
+        --border-color: rgba(229, 231, 235, 0.9);
+        --text-primary: #111827;
+        --text-secondary: #4b5563;
+        --text-muted: #9ca3af;
+        --accent: #128c7e;
+        --accent-hover: #25d366;
+        --accent-light: rgba(37, 211, 102, 0.15);
+        --emerald: #25d366;
+      }
+
+      html.light-mode .bg-zinc-950,
+      html.light-mode body {
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary) !important;
+      }
+
+      html.light-mode .bg-zinc-900\/50,
+      html.light-mode .bg-zinc-900\/20,
+      html.light-mode .bg-zinc-900\/80,
+      html.light-mode .bg-zinc-900\/60,
+      html.light-mode .bg-zinc-900,
+      html.light-mode .bg-zinc-950\/30,
+      html.light-mode .bg-zinc-900\/30 {
+        background-color: var(--bg-card) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-primary) !important;
+      }
+
+      html.light-mode .bg-zinc-950\/30,
+      html.light-mode .bg-zinc-900\/30 {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+      }
+
+      html.light-mode .bg-zinc-950 {
+        background-color: var(--bg-inner) !important;
+      }
+
+      html.light-mode .border-zinc-900,
+      html.light-mode .border-zinc-800\/80,
+      html.light-mode .border-zinc-800\/60,
+      html.light-mode .border-zinc-800,
+      html.light-mode .border-zinc-700 {
+        border-color: var(--border-color) !important;
+      }
+
+      html.light-mode .text-zinc-100 { color: #111827 !important; }
+      html.light-mode .text-zinc-200 { color: #1f2937 !important; }
+      html.light-mode .text-zinc-300 { color: #374151 !important; }
+      html.light-mode .text-zinc-400 { color: #4b5563 !important; }
+      html.light-mode .text-zinc-500 { color: #6b7280 !important; }
+      html.light-mode .text-zinc-600 { color: #9ca3af !important; }
+      html.light-mode .text-zinc-700 { color: #d1d5db !important; }
+
+      html.light-mode .modal-content {
+        background-color: #ffffff !important;
+        border-color: #e5e7eb !important;
+        color: #111827 !important;
+      }
+
+      html.light-mode .form-input {
+        background-color: #f3f4f6 !important;
+        border-color: #d1d5db !important;
+        color: #111827 !important;
+      }
+
+      html.light-mode .form-input:focus {
+        border-color: #128c7e !important;
+      }
+
+      html.light-mode select,
+      html.light-mode option {
+        background-color: #ffffff !important;
+        color: #111827 !important;
+        border-color: #e5e7eb !important;
+      }
+
+      html.light-mode header,
+      html.light-mode footer {
+        background-color: #ffffff !important;
+        border-color: rgba(229, 231, 235, 0.9) !important;
+      }
+
+      html, body {
+        height: 100%;
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Custom Scrollbars */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #3f3f46;
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #52525b;
+      }
+
+      /* Image Cropper Canvas workspace background pattern */
+      .cropper-container-wrapper {
+        background-color: #09090b;
+        background-image: radial-gradient(#27272a 1px, transparent 1px);
+        background-size: 16px 16px;
+      }
+
+      /* Pure CSS Utility Framework Replacement */
+      .flex { display: flex; }
+      .flex-col { flex-direction: column; }
+      .flex-row { flex-direction: row; }
+      .items-center { align-items: center; }
+      .justify-between { justify-content: space-between; }
+      .justify-center { justify-content: center; }
+      .flex-grow { flex-grow: 1; }
+      .flex-wrap { flex-wrap: wrap; }
+      .shrink-0 { flex-shrink: 0; }
+      
+      .grid { display: grid; }
+      .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      
+      @media (min-width: 1024px) {
+        .lg\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+        .lg\:col-span-7 { grid-column: span 7 / span 7; }
+        .lg\:col-span-5 { grid-column: span 5 / span 5; }
+      }
+      
+      .gap-1\.5 { gap: 0.375rem; }
+      .gap-2 { gap: 0.5rem; }
+      .gap-2\.5 { gap: 0.625rem; }
+      .gap-3 { gap: 0.75rem; }
+      .gap-4 { gap: 1rem; }
+      .gap-6 { gap: 1.5rem; }
+      .items-stretch { align-items: stretch; }
+      
+      /* Sizing and Spacers */
+      .w-full { width: 100%; }
+      .h-full { height: 100%; }
+      .min-h-screen { min-height: 100vh; }
+      .max-w-7xl { max-width: 80rem; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .mt-auto { margin-top: auto; }
+      .mt-0\.5 { margin-top: 0.125rem; }
+      .mb-1 { margin-bottom: 0.25rem; }
+      .mb-2 { margin-bottom: 0.5rem; }
+      .mb-3 { margin-bottom: 0.75rem; }
+      .mb-4 { margin-bottom: 1rem; }
+      .mb-6 { margin-bottom: 1.5rem; }
+      
+      .w-10 { width: 2.5rem; }
+      .h-10 { height: 2.5rem; }
+      .h-20 { height: 5rem; }
+      .h-8 { height: 2rem; }
+      .w-4 { width: 1rem; }
+      .h-4 { height: 1rem; }
+      .w-5 { width: 1.25rem; }
+      .h-5 { height: 1.25rem; }
+      .w-64 { width: 16rem; }
+      .h-64 { height: 16rem; }
+      .w-\[1px\] { width: 1px; }
+      
+      .min-h-\[350px\] { min-height: 350px; }
+      .min-h-\[380px\] { min-height: 380px; }
+      .min-h-\[140px\] { min-height: 140px; }
+      .max-h-\[480px\] { max-height: 480px; }
+      .max-h-\[140px\] { max-height: 140px; }
+      
+      /* Padding Utility library */
+      .p-1 { padding: 0.25rem; }
+      .p-1\.5 { padding: 0.375rem; }
+      .p-2\.5 { padding: 0.625rem; }
+      .p-3 { padding: 0.75rem; }
+      .p-4 { padding: 1rem; }
+      .p-5 { padding: 1.25rem; }
+      .p-6 { padding: 1.5rem; }
+      .p-8 { padding: 2rem; }
+      .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+      .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+      .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+      .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+      .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+      .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+      .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+      .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+      .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+      .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+      .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .px-4 { padding-left: 1rem; padding-right: 1rem; }
+      .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .px-8 { padding-left: 2rem; padding-right: 2rem; }
+      
+      @media (min-width: 640px) {
+        .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .sm\:p-8 { padding: 2rem; }
+        .sm\:flex-row { flex-direction: row; }
+        .sm\:w-auto { width: auto; }
+      }
+      @media (min-width: 1024px) {
+        .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .lg\:py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+      }
+      
+      /* Borders & Corners styling */
+      .border { border: 1px solid #27272a; }
+      .border-b { border-bottom: 1px solid #18181b; }
+      .border-t { border-top: 1px solid #18181b; }
+      .border-dashed { border-style: dashed; }
+      .border-zinc-900 { border-color: #18181b; }
+      .border-zinc-800\/80 { border-color: rgba(39, 39, 42, 0.8); }
+      .border-zinc-800\/60 { border-color: rgba(39, 39, 42, 0.6); }
+      .border-zinc-800 { border-color: #27272a; }
+      .border-zinc-700\/60 { border-color: rgba(63, 63, 70, 0.6); }
+      .border-emerald-500\/20 { border-color: rgba(16, 185, 129, 0.2); }
+      
+      .rounded-lg { border-radius: 0.5rem; }
+      .rounded-xl { border-radius: 0.75rem; }
+      .rounded-2xl { border-radius: 1rem; }
+      .rounded-\[2rem\] { border-radius: 2rem; }
+      .rounded-\[2\.5rem\] { border-radius: 2.5rem; }
+      
+      /* Typography System */
+      .font-sans { font-family: var(--font-sans); }
+      .font-mono { font-family: var(--font-mono); }
+      
+      .text-xs { font-size: 0.75rem; }
+      .text-sm { font-size: 0.875rem; }
+      .text-base { font-size: 1rem; }
+      .text-lg { font-size: 1.125rem; }
+      .text-xl { font-size: 1.25rem; }
+      .text-\[10px\] { font-size: 10px; }
+      .text-\[9px\] { font-size: 9px; }
+      
+      .font-bold { font-weight: 700; }
+      .font-semibold { font-weight: 600; }
+      .font-medium { font-weight: 500; }
+      .font-black { font-weight: 900; }
+      
+      .uppercase { text-transform: uppercase; }
+      .italic { font-style: italic; }
+      .tracking-tight { letter-spacing: -0.025em; }
+      .tracking-tighter { letter-spacing: -0.05em; }
+      .tracking-wide { letter-spacing: 0.025em; }
+      .tracking-widest { letter-spacing: 0.1em; }
+      .leading-none { line-height: 1; }
+      .leading-relaxed { line-height: 1.625; }
+      
+      /* Colors and Tones */
+      .text-zinc-100 { color: #f4f4f5; }
+      .text-zinc-200 { color: #e4e4e7; }
+      .text-zinc-300 { color: #d4d4d8; }
+      .text-zinc-400 { color: #a1a1aa; }
+      .text-zinc-500 { color: #71717a; }
+      .text-zinc-600 { color: #52525b; }
+      .text-zinc-700 { color: #3f3f46; }
+      .text-indigo-500 { color: #6366f1; }
+      .text-indigo-400 { color: #818cf8; }
+      .text-emerald-400 { color: #34d399; }
+      .text-rose-400 { color: #f87171; }
+      
+      /* Solid & Semi-transparent Background classes */
+      .bg-zinc-950 { background-color: #09090b; }
+      .bg-zinc-900\/50 { background-color: rgba(24, 24, 27, 0.5); }
+      .bg-zinc-900\/20 { background-color: rgba(24, 24, 27, 0.2); }
+      .bg-zinc-900\/80 { background-color: rgba(24, 24, 27, 0.8); }
+      .bg-zinc-900\/60 { background-color: rgba(24, 24, 27, 0.6); }
+      .bg-zinc-900 { background-color: #18181b; }
+      .bg-zinc-800 { background-color: #27272a; }
+      .bg-zinc-800\/80 { background-color: rgba(39, 39, 42, 0.8); }
+      .bg-zinc-800\/60 { background-color: rgba(39, 39, 42, 0.6); }
+      .bg-zinc-800\/40 { background-color: rgba(39, 39, 42, 0.4); }
+      .bg-indigo-600 { background-color: #4f46e5; }
+      .bg-indigo-900\/5 { background-color: rgba(49, 46, 129, 0.05); }
+      .bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.1); }
+      
+      /* Layout & Structural Layout Elements */
+      .sticky { position: sticky; }
+      .top-0 { top: 0; }
+      .z-40 { z-index: 40; }
+      .z-50 { z-index: 50; }
+      .relative { position: relative; }
+      .absolute { position: absolute; }
+      .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+      .overflow-hidden { overflow: hidden; }
+      .overflow-y-auto { overflow-y: auto; }
+      .blur-3xl { filter: blur(64px); }
+      .pointer-events-none { pointer-events: none; }
+      
+      /* Interactive States & Transitions */
+      .ratio-btn, .modifier-btn {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+      .duration-200 { transition-duration: 200ms; }
+      .duration-350 { transition-duration: 350ms; }
+      
+      .hover\:bg-indigo-500:hover { background-color: #25d366; }
+      .hover\:bg-zinc-750:hover { background-color: #333336; }
+      .hover\:bg-zinc-700\/80:hover { background-color: rgba(63, 63, 70, 0.8); }
+      .hover\:text-zinc-100:hover { color: #f4f4f5; }
+      .hover\:scale-\[1\.02\]:hover { transform: scale(1.02); }
+      .hover\:border-indigo-500\/50:hover { border-color: rgba(37, 211, 102, 0.5); }
+      .hover\:text-white:hover { color: #ffffff; }
+      .hover\:text-zinc-200:hover { color: #e4e4e7; }
+      .active\:scale-95:active { transform: scale(0.95); }
+      
+      /* Dynamic classes added & modified by Javascript */
+      .bg-indigo-600 { background-color: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; }
+      .text-white { color: #ffffff !important; }
+      .border-indigo-600 { border-color: var(--accent) !important; }
+      .bg-zinc-800 { background-color: #27272a !important; color: #d4d4d8 !important; }
+      .text-zinc-300 { color: #d4d4d8 !important; }
+      
+      .bg-indigo-950\/60 { background-color: rgba(37, 211, 102, 0.1) !important; color: #25d366 !important; border-color: rgba(37, 211, 102, 0.3) !important; }
+      .text-indigo-400 { color: #25d366 !important; }
+      .border-indigo-500\/50 { border-color: rgba(37, 211, 102, 0.3) !important; }
+      
+      .bg-zinc-800\/60 { background-color: rgba(39, 39, 42, 0.6) !important; color: #a1a1aa !important; border-color: #27272a !important; }
+      .text-zinc-400 { color: #a1a1aa !important; }
+      .border-zinc-800 { border-color: #27272a !important; }
+      
+      /* Loading & State badges toggled by JS */
+      .bg-indigo-950 { background-color: rgba(18, 140, 126, 0.15) !important; border-color: rgba(37, 211, 102, 0.3) !important; color: #25d366 !important; }
+      .border-indigo-900 { border-color: rgba(18, 140, 126, 0.4) !important; }
+      .bg-emerald-950 { background-color: rgba(6, 78, 59, 0.8) !important; border-color: rgba(37, 211, 102, 0.3) !important; color: #25d366 !important; }
+      .border-emerald-900 { border-color: rgba(6, 95, 70, 0.8) !important; }
+      
+      /* Button Copy States */
+      .bg-emerald-600 { background-color: #059669 !important; }
+      .hover\:bg-emerald-500:hover { background-color: #10b981 !important; }
+
+      /* Animation keyframes */
+      .animate-spin {
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .5; }
+      }
+      
+      /* Depth & Shadows */
+      .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+      .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+      .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+      .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+      .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+      .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+      
+      /* Helpful Classes */
+      .hidden { display: none !important; }
+      .cursor-pointer { cursor: pointer; }
+      .cursor-not-allowed { cursor: not-allowed; }
+      .select-text { user-select: text; }
+      .text-left { text-align: left; }
+      .whitespace-pre-wrap { white-space: pre-wrap; }
+
+      /* Custom Nav & Tabs Style */
+      .nav-link {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+      }
+      .nav-link:hover {
+        color: var(--text-primary);
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+       .nav-link.active {
+        background-color: rgba(37, 211, 102, 0.15);
+        color: #25d366 !important;
+      }
+
+      /* Global Icon & Support rules for WhatsApp green standardization */
+      header i,
+      main i,
+      footer i,
+      .nav-link i,
+      .mobile-nav-link i,
+      #drop-zone i,
+      #cropper-workspace i,
+      #output-container i,
+      #view-dashboard i,
+      #view-pricing i {
+        color: #25d366 !important;
+      }
+      button.bg-indigo-600 i,
+      button.bg-emerald-600 i,
+      button.bg-indigo-500 i,
+      button.bg-emerald-500 i,
+      #checkout-pay-btn i,
+      #auth-submit-btn i,
+      #generate-btn i {
+        color: #ffffff !important;
+      }
+
+      /* Modal Background and Dialog */
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(9, 9, 11, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .modal-content {
+        background-color: #18181b;
+        border: 1px solid rgba(63, 63, 70, 0.8);
+        border-radius: 1.5rem;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes modalScaleIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      /* Form inputs */
+      .form-input {
+        width: 100%;
+        background-color: #09090b;
+        border: 1px solid #27272a;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        color: #f4f4f5;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .form-input:focus {
+        border-color: #25d366;
+      }
+
+      /* Pricing Card badge */
+      .popular-badge {
+        background: linear-gradient(135deg, #128c7e, #25d366);
+        color: #ffffff;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script>
+      // Firebase Config
+      const firebaseConfig = {
+        apiKey: "AIzaSyCFyGzp7viV1tq25DAMnpKKSJpPngtVa14",
+        authDomain: "gen-lang-client-0844549707.firebaseapp.com",
+        projectId: "gen-lang-client-0844549707",
+        storageBucket: "gen-lang-client-0844549707.firebasestorage.app",
+        messagingSenderId: "845800015860",
+        appId: "1:845800015860:web:a6229be704605991785ba1"
+      };
+
+      // Initialize Firebase (Safely check if already initialized)
+      if (firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      var auth = firebase.auth();
+      console.log("Firebase initialized");
+
+      // Google Sign In
+      function signInWithGoogle() {
+        console.log("Starting Google Sign In...");
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({
+          prompt: 'select_account'
+        });
+        auth.signInWithPopup(provider)
+          .then(async (result) => {
+            console.log("Login successful!", result.user);
+            
+            // Get the Firebase ID token and store it so Express server can verify it
+            const idToken = await result.user.getIdToken();
+            localStorage.setItem('auth_token', idToken);
+            
+            // Sync user state smoothly without hard reload if functions are loaded
+            if (typeof checkAuthMe === 'function') {
+              await checkAuthMe();
+            }
+            if (typeof closeAuthModal === 'function') {
+              closeAuthModal();
+            }
+            
+            // Seamlessly display beautiful status notifications and route views
+            if (typeof showToast === 'function') {
+              showToast("Login successful!", "Welcome back, " + (result.user.displayName || result.user.email.split('@')[0]) + "!");
+            }
+            
+            if (typeof showView === 'function') {
+              showView('dashboard');
+              try {
+                window.history.pushState({}, '', '#dashboard');
+              } catch (e) {
+                console.warn("History pushState blocked/failed:", e);
+              }
+            } else {
+              window.location.hash = "dashboard";
+            }
+          })
+          .catch((error) => {
+            console.error("Login error:", error);
+            if (typeof showToast === 'function') {
+              showToast("Login failed", error.message);
+            } else {
+              alert("Login failed: " + error.message);
+            }
+          });
+      }
+    </script>
+  </head>
+  <body class="font-sans antialiased text-zinc-100 min-h-screen flex flex-col bg-zinc-950">
+    <!-- Navigation Bar / Header -->
+    <header class="bg-zinc-950 border-b border-zinc-900 sticky top-0 z-40 animate-fadeIn">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative">
+        <!-- Logo and Branding -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showView('generator')">
+          <img src="https://geminipromptgenerator.online/blog/wp-content/uploads/2026/07/logo-2.webp" alt="Logo" class="h-10 w-auto object-contain" referrerPolicy="no-referrer" />
+          <div class="hidden sm:block">
+            <h1 class="text-base font-bold tracking-tight text-zinc-100 uppercase">
+              Gemini<span style="color: #25d366 !important;">Prompt</span>
+            </h1>
+            <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-semibold">Prompt Generator v3.5</p>
+          </div>
+        </div>
+        
+        <!-- Navigation Tabs (Hidden on mobile) -->
+        <nav class="hidden md:flex items-center gap-1">
+          <a onclick="showView('generator')" id="nav-generator" class="nav-link active">
+            <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+            <span>Generator</span>
+          </a>
+          <a onclick="showView('pricing')" id="nav-pricing" class="nav-link">
+            <i class="fa-solid fa-tags text-xs"></i>
+            <span>Pricing</span>
+          </a>
+          <a onclick="showView('dashboard')" id="nav-dashboard" class="nav-link hidden">
+            <i class="fa-solid fa-chart-line text-xs"></i>
+            <span>Dashboard</span>
+          </a>
+        </nav>
+
+        <!-- Right Controls Area (Theme, Auth, Hamburguer) -->
+        <div class="flex items-center gap-3">
+          <!-- Light Mode Switcher (Always visible) -->
+          <button onclick="toggleTheme()" class="p-2.5 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 rounded-xl border border-zinc-800 transition-all cursor-pointer flex items-center justify-center" id="theme-toggle-btn" title="Toggle Light/Dark Mode">
+            <i class="fa-solid fa-moon text-xs"></i>
+          </button>
+
+          <!-- Auth Status Controls (Hidden on mobile) -->
+          <div class="hidden md:flex items-center gap-3">
+            <!-- Logged Out View -->
+            <div id="auth-logged-out" class="flex items-center gap-2">
+              <button onclick="openAuthModal('login')" class="px-4 py-2 bg-transparent text-zinc-300 hover:text-white hover:bg-zinc-900 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer">
+                Log In
+              </button>
+              <button onclick="openAuthModal('signup')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg transition-all active:scale-95 cursor-pointer">
+                Sign Up
+              </button>
+            </div>
+            
+            <!-- Logged In View -->
+            <div id="auth-logged-in" class="hidden flex items-center gap-3">
+              <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl cursor-pointer hover:border-indigo-500/50 transition-colors" onclick="showView('dashboard')">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="header-user-name" class="text-xs font-semibold text-zinc-300 max-w-[80px] truncate">User</span>
+                <span class="text-xs text-indigo-400 font-mono font-bold ml-1 border-l border-zinc-800 pl-2">
+                  <i class="fa-solid fa-coins text-[10px] mr-1"></i><span id="header-credits-count">3</span>
+                </span>
+              </div>
+              <button onclick="handleLogout()" class="p-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 rounded-xl border border-zinc-800 transition-all cursor-pointer" title="Log Out">
+                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Hamburger Toggle Button -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 rounded-xl border border-zinc-800 transition-all cursor-pointer flex items-center justify-center" id="mobile-menu-toggle-btn" aria-label="Toggle Menu">
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown Menu -->
+      <div id="mobile-dropdown-menu" class="hidden md:hidden border-t border-zinc-900 bg-zinc-950 p-4 flex flex-col gap-3 animate-fadeIn">
+        <a onclick="showView('generator'); toggleMobileMenu()" class="mobile-nav-link text-xs font-bold uppercase tracking-wider p-3 bg-zinc-900/40 rounded-xl flex items-center gap-3 cursor-pointer">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> Generator
+        </a>
+        <a onclick="showView('pricing'); toggleMobileMenu()" class="mobile-nav-link text-xs font-bold uppercase tracking-wider p-3 bg-zinc-900/40 rounded-xl flex items-center gap-3 cursor-pointer">
+          <i class="fa-solid fa-tags text-xs"></i> Pricing
+        </a>
+        <a onclick="showView('dashboard'); toggleMobileMenu()" id="mobile-nav-dashboard" class="mobile-nav-link text-xs font-bold uppercase tracking-wider p-3 bg-zinc-900/40 rounded-xl flex items-center gap-3 cursor-pointer hidden">
+          <i class="fa-solid fa-chart-line text-xs"></i> Dashboard
+        </a>
+        <div class="h-[1px] bg-zinc-900 my-1"></div>
+        <div id="mobile-auth-logged-out" class="flex flex-col gap-2">
+          <button onclick="openAuthModal('login'); toggleMobileMenu()" class="w-full py-3 bg-transparent text-zinc-300 hover:text-white border border-zinc-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer">
+            Log In
+          </button>
+          <button onclick="openAuthModal('signup'); toggleMobileMenu()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg transition-all cursor-pointer">
+            Sign Up
+          </button>
+        </div>
+        <div id="mobile-auth-logged-in" class="hidden flex flex-col gap-3 bg-zinc-900/30 p-3 rounded-xl border border-zinc-900">
+          <div class="flex items-center justify-between cursor-pointer" onclick="showView('dashboard'); toggleMobileMenu()">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="mobile-header-user-name" class="text-xs font-semibold text-zinc-300">User</span>
+            </div>
+            <div class="text-xs text-indigo-400 font-mono font-bold">
+              <i class="fa-solid fa-coins text-[10px] mr-1"></i><span id="mobile-header-credits-count">3</span> credits
+            </div>
+          </div>
+          <button onclick="handleLogout(); toggleMobileMenu()" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 rounded-xl border border-zinc-800 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2">
+            <i class="fa-solid fa-right-from-bracket text-xs"></i> Log Out
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Bento Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+      
+      <!-- VIEW: GENERATOR (Main App) -->
+      <div id="view-generator" class="flex flex-col gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          <!-- Bento Card 1: Image Workspace Area (col-span-7) -->
+          <div class="lg:col-span-7 bg-zinc-900\/50 border border-zinc-800\/80 rounded-\[2rem\] p-6 shadow-xl flex flex-col gap-4 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-900\/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="p-1.5 bg-zinc-800 rounded-lg text-indigo-400 flex items-center justify-center">
+                  <i data-lucide="image" class="w-4 h-4"></i>
+                </span>
+                <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400">Source Image Workspace</h2>
+              </div>
+              <span id="image-status-badge" class="hidden text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                Image Ready
+              </span>
+            </div>
+
+            <!-- Drag and Drop Zone -->
+            <div id="drop-zone" class="border border-dashed border-zinc-800 hover:border-indigo-500/50 bg-zinc-900/20 rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center min-h-[380px] flex-grow">
+              <input type="file" id="file-input" class="hidden" accept="image/*" />
+              <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-inner mb-4 text-zinc-500">
+                <i data-lucide="upload-cloud" class="w-10 h-10 text-indigo-500"></i>
+              </div>
+              <p class="font-semibold text-zinc-200 text-base mb-1">Drag and drop your image here</p>
+              <p class="text-zinc-500 text-xs mb-6 tracking-wide">Supports PNG, JPG, JPEG, WEBP</p>
+              <button type="button" id="browse-btn" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg transition-all active:scale-95">
+                Browse Files
+              </button>
+            </div>
+
+            <!-- Image Workspace Container (Hidden until image is loaded) -->
+            <div id="cropper-workspace" class="hidden flex flex-col gap-4 flex-grow">
+              <div class="rounded-2xl overflow-hidden relative border border-zinc-800 flex items-center justify-center min-h-[350px] max-h-[480px] bg-zinc-950/40">
+                <img id="cropper-image" src="" alt="Source Image" class="max-w-full max-h-[480px] object-contain rounded-xl p-2" />
+              </div>
+
+              <!-- Action Toolbar (Swap Image Only) -->
+              <div class="flex items-center justify-end gap-3 pt-1">
+                <button type="button" id="change-image-btn" class="px-5 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-700 transition-all cursor-pointer">
+                  Swap Image
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bento Card 2: Settings & Generation Parameters (col-span-5) -->
+          <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Generator Parameters Panel -->
+            <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-[2rem] p-6 shadow-xl flex flex-col gap-4 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="p-1.5 bg-zinc-800 rounded-lg text-indigo-400 flex items-center justify-center">
+                    <i data-lucide="sliders" class="w-4 h-4"></i>
+                  </span>
+                  <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400">Generator Configuration</h2>
+                </div>
+                <div class="flex items-center gap-1.5 bg-zinc-950/40 px-2.5 py-1 rounded-xl border border-zinc-800">
+                  <i class="fa-solid fa-coins text-[10px] text-emerald-500"></i>
+                  <span id="generator-credits-display" class="text-xs font-mono font-bold text-emerald-400">60</span>
+                  <span class="text-[9px] text-zinc-500 font-bold uppercase">creds</span>
+                </div>
+              </div>
+
+              <!-- Prompt Style Selection -->
+              <div class="flex flex-col gap-2">
+                <label for="prompt-style" class="text-\[10px\] font-bold uppercase tracking-widest text-zinc-500">Output Style Tuning</label>
+                <select id="prompt-style" class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-xl px-4 py-3.5 text-sm text-zinc-200 outline-none cursor-pointer transition-colors">
+                  <option value="descriptive">Detailed Description (Standard Analysis)</option>
+                  <option value="recreation">Perfect AI Recreation (Midjourney/DALL-E Prompt)</option>
+                  <option value="artistic">Artistic & Cinematic Focus (Styles & Moods)</option>
+                  <option value="minimalist">Minimalist (Short & Punchy Description)</option>
+                </select>
+              </div>
+
+              <!-- Prompt Modifiers presets -->
+              <div class="flex flex-col gap-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-\[10px\] font-bold uppercase tracking-widest text-zinc-500">Quick Style Modifiers</span>
+                  <button type="button" id="clear-modifiers-btn" class="text-[9px] uppercase tracking-widest text-zinc-500 hover:text-zinc-300 font-bold bg-transparent border-0 cursor-pointer">Clear All</button>
+                </div>
+                <div class="flex flex-wrap gap-1.5 max-h-\[140px\] overflow-y-auto custom-scrollbar pr-1">
+                  <!-- Lighting Presets -->
+                  <button type="button" data-modifier="dramatic golden hour lighting" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">🌅 Golden Hour</button>
+                  <button type="button" data-modifier="neon cyberpunk synthwave lighting" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">🌌 Cyberpunk Neon</button>
+                  <button type="button" data-modifier="moody cinematic volumetric fog and film grain" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">🎬 Cinematic Moody</button>
+                  <button type="button" data-modifier="soft studio portrait lighting with bokeh background" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">📸 Studio Bokeh</button>
+                  <!-- Style presets -->
+                  <button type="button" data-modifier="ultra-detailed oil painting masterpiece art style" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">🖌️ Oil Painting</button>
+                  <button type="button" data-modifier="clean minimalist line-art aesthetic" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">✏️ Line-Art</button>
+                  <button type="button" data-modifier="vibrant watercolor and ink wash illustration style" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">🎨 Watercolor Ink</button>
+                  <button type="button" data-modifier="photorealistic 8k octane render hyper-detailed texture" class="modifier-btn px-2.5 py-1.5 bg-zinc-800\/60 border border-zinc-800 text-zinc-400 hover:bg-indigo-950\/20 hover:text-indigo-400 hover:border-indigo-900\/50 rounded-lg text-xs font-medium cursor-pointer">⚡ Hyper-Real</button>
+                </div>
+              </div>
+
+              <!-- Custom Instructions input field -->
+              <div class="flex flex-col gap-2">
+                <label for="custom-instructions" class="text-\[10px\] font-bold uppercase tracking-widest text-zinc-500">Custom Instructions (Optional)</label>
+                <textarea id="custom-instructions" rows="3" placeholder="Specify Leica camera configurations, focus textures, hyperreal settings, etc..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-zinc-200 outline-none resize-none placeholder-zinc-700 transition-colors"></textarea>
+              </div>
+
+              <!-- Generate Button -->
+              <button type="button" id="generate-btn" disabled class="w-full py-4 bg-zinc-800\/40 text-zinc-700 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-zinc-800\/60 transition-all duration-200 cursor-pointer">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Generate Prompt</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bento Card 3: High Contrast Full-Width Generated Output Block -->
+        <div id="output-container" class="bg-zinc-900\/50 border border-zinc-800\/80 text-zinc-100 rounded-\[2.5rem\] p-6 sm:p-8 flex flex-col gap-6 shadow-xl relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-950\/10 to-transparent pointer-events-none"></div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <h3 class="text-\[10px\] font-black uppercase text-zinc-400 tracking-widest">Generated Output</h3>
+              <div id="output-state-badge" class="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-400 text-[9px] font-bold uppercase tracking-wider rounded-full">
+                Waiting for Input
+              </div>
+            </div>
+            
+            <div id="prompt-stats" class="hidden flex items-center gap-2 text-zinc-500 text-xs font-mono">
+              <span id="char-count">0 chars</span>
+              <span>•</span>
+              <span id="word-count">0 words</span>
+            </div>
+          </div>
+
+          <div class="relative min-h-\[140px\] flex flex-col">
+            
+            <!-- Empty State visual -->
+            <div id="output-empty" class="absolute inset-0 flex flex-col items-center justify-center text-center py-8">
+              <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl mb-3 text-zinc-500">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+              </div>
+              <p class="text-zinc-300 font-bold text-sm tracking-wide">Ready for analysis</p>
+              <p class="text-zinc-600 text-xs mt-1">Upload an image and hit Generate to render the perfect prompt.</p>
+            </div>
+
+            <!-- Loading Skeleton -->
+            <div id="output-loading" class="hidden absolute inset-0 flex flex-col gap-3 justify-center">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="inline-block w-4 h-4 rounded-full bg-indigo-500 animate-spin border-2 border-zinc-950 border-t-transparent"></span>
+                <p class="text-zinc-400 text-xs font-bold tracking-wide uppercase animate-pulse">Gemini analyzing lighting, textures & style elements...</p>
+              </div>
+              <div class="h-4 bg-zinc-800\/60 rounded-md w-full animate-pulse"></div>
+              <div class="h-4 bg-zinc-800\/60 rounded-md w-\[94%\] animate-pulse"></div>
+              <div class="h-4 bg-zinc-800\/60 rounded-md w-\[80%\] animate-pulse"></div>
+            </div>
+
+            <!-- Real Generated Prompt Display -->
+            <div id="output-display" class="hidden flex-grow flex flex-col sm:flex-row gap-6 items-center justify-between">
+              <div class="flex-grow w-full select-text text-left">
+                <p id="generated-prompt-text" class="text-lg sm:text-xl font-medium leading-relaxed italic tracking-tight text-zinc-100 font-sans whitespace-pre-wrap select-text"></p>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
+                <button type="button" id="copy-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-3 hover:scale-\[1\.02\] transition-all shadow-lg uppercase text-xs tracking-widest shrink-0 cursor-pointer">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                  <span>Copy Prompt</span>
+                </button>
+                <button type="button" id="re-generate-btn" class="text-xs font-bold text-zinc-400 uppercase tracking-widest hover:text-white transition-colors bg-zinc-800\/80 hover:bg-zinc-700 border border-zinc-700 py-4 px-5 rounded-2xl flex items-center justify-center cursor-pointer" title="Re-generate prompt">
+                  <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: PRICING -->
+      <div id="view-pricing" class="hidden flex flex-col gap-8 py-4 animate-fadeIn">
+        <div class="text-center max-w-2xl mx-auto flex flex-col gap-3">
+          <span class="px-3 py-1 bg-indigo-950/60 border border-indigo-900/50 text-indigo-400 text-xs font-bold uppercase tracking-widest rounded-full w-fit mx-auto">Flexible Credit Packs</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white uppercase">Affordable Prompt Packs</h2>
+          <p class="text-zinc-400 text-sm">Convert any visual artwork, real photography, or UI layout to high-fidelity AI prompt code instantly.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full mt-4 items-stretch">
+          <!-- Starter Plan -->
+          <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between gap-6 relative overflow-hidden shadow-lg">
+            <div class="flex flex-col gap-4">
+              <div>
+                <h3 class="text-zinc-400 text-xs font-bold uppercase tracking-widest">Free Guest Pack</h3>
+                <div class="flex items-baseline gap-1 mt-2">
+                  <span class="text-4xl font-extrabold text-white">$0</span>
+                  <span class="text-zinc-500 text-xs font-medium">Starter</span>
+                </div>
+              </div>
+              <p class="text-zinc-400 text-xs">Test the vision analysis tools with free guest credits immediately.</p>
+              <div class="h-[1px] bg-zinc-800 my-1"></div>
+              <ul class="flex flex-col gap-3 text-xs text-zinc-300">
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> 60 Free Guest Credits</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> No Sign Up Required</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Standard GPU Processing</li>
+              </ul>
+            </div>
+            <button onclick="showView('generator')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-700 transition-all cursor-pointer">
+              Use Guest Credits
+            </button>
+          </div>
+
+          <!-- Pro Plan ($5 for 50 credits) -->
+          <div class="bg-indigo-950/10 border-2 border-indigo-500 rounded-2xl p-6 flex flex-col justify-between gap-6 relative overflow-hidden shadow-2xl">
+            <div class="absolute top-4 right-4">
+              <span class="popular-badge">Most Popular</span>
+            </div>
+            <div class="flex flex-col gap-4">
+              <div>
+                <h3 class="text-indigo-400 text-xs font-bold uppercase tracking-widest text-indigo-400">Pro Prompt Pack</h3>
+                <div class="flex items-baseline gap-1 mt-2">
+                  <span class="text-4xl font-extrabold text-white">$5</span>
+                  <span class="text-zinc-400 text-xs font-medium">One-Time Buy</span>
+                </div>
+              </div>
+              <p class="text-zinc-300 text-xs">Perfect for continuous creators, digital artists, and AI power-users.</p>
+              <div class="h-[1px] bg-indigo-900/30 my-1"></div>
+              <ul class="flex flex-col gap-3 text-xs text-zinc-200">
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> <strong class="text-white">50 Premium Credits</strong></li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Perfect Recreation Prompting</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Golden Hour & Cinema Moody styles</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> High-Priority Server Pipeline</li>
+              </ul>
+            </div>
+            <button onclick="startRazorpayCheckout(5, 50, 'USD')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg transition-all active:scale-95 cursor-pointer">
+              Buy 50 Credits Now
+            </button>
+          </div>
+
+          <!-- Mega Plan -->
+          <div class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between gap-6 relative overflow-hidden shadow-lg">
+            <div class="flex flex-col gap-4">
+              <div>
+                <h3 class="text-zinc-400 text-xs font-bold uppercase tracking-widest">Mega Prompt Pack</h3>
+                <div class="flex items-baseline gap-1 mt-2">
+                  <span class="text-4xl font-extrabold text-white">$12</span>
+                  <span class="text-zinc-500 text-xs font-medium">Save 20%</span>
+                </div>
+              </div>
+              <p class="text-zinc-400 text-xs">Designed for enterprise design studios and high-volume marketing agencies.</p>
+              <div class="h-[1px] bg-zinc-800 my-1"></div>
+              <ul class="flex flex-col gap-3 text-xs text-zinc-300">
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> <strong class="text-white">150 Premium Credits</strong></li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Dedicated Support Engineers</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> Custom style tuning templates</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-400"></i> API Endpoint Direct Integration</li>
+              </ul>
+            </div>
+            <button onclick="startRazorpayCheckout(12, 150, 'USD')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-700 transition-all cursor-pointer">
+              Buy 150 Credits
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VIEW: DASHBOARD -->
+      <div id="view-dashboard" class="hidden flex flex-col gap-6 py-4 animate-fadeIn">
+        <!-- User Profile Card -->
+        <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-[2.5rem] p-6 sm:p-8 relative overflow-hidden shadow-xl">
+          <div class="absolute top-0 right-0 w-80 h-80 bg-indigo-900/5 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                <i class="fa-solid fa-user-astronaut"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 id="dashboard-username" class="text-lg font-bold text-white uppercase">Astronaut</h2>
+                  <span id="dashboard-role-badge" class="px-2 py-0.5 bg-indigo-950 border border-indigo-900 text-indigo-400 text-[8px] font-bold uppercase tracking-wider rounded-full">Premium User</span>
+                </div>
+                <p id="dashboard-email" class="text-zinc-500 text-xs mt-0.5">user@example.com</p>
+              </div>
+            </div>
+
+            <!-- Balance Tracker -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl flex items-center gap-4 min-w-[180px]">
+                <div class="w-10 h-10 bg-indigo-950 text-indigo-400 rounded-xl flex items-center justify-center text-base">
+                  <i class="fa-solid fa-coins"></i>
+                </div>
+                <div>
+                  <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Credit Balance</p>
+                  <p id="dashboard-credits" class="text-xl font-bold font-mono text-emerald-400">3</p>
+                </div>
+              </div>
+              <button onclick="showView('pricing')" class="px-5 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all cursor-pointer">
+                Add Credits
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompt History Logs -->
+        <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-[2.5rem] p-6 sm:p-8 flex flex-col gap-6 shadow-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="p-1.5 bg-zinc-800 rounded-lg text-indigo-400 flex items-center justify-center">
+                <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+              </span>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-400">Your Prompt History</h3>
+            </div>
+            <span id="history-count-badge" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 font-mono">
+              0 prompts
+            </span>
+          </div>
+
+          <!-- Empty History state -->
+          <div id="history-empty" class="flex flex-col items-center justify-center text-center py-12 border border-dashed border-zinc-800 rounded-2xl bg-zinc-900/20">
+            <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl mb-3 text-zinc-500">
+              <i class="fa-solid fa-folder-open text-base"></i>
+            </div>
+            <p class="text-zinc-300 font-bold text-sm tracking-wide">No Prompts Found</p>
+            <p class="text-zinc-600 text-xs mt-1">Transform your first image under the Generator tab to populate history!</p>
+            <button onclick="showView('generator')" class="mt-4 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-700 transition-all cursor-pointer">
+              Launch Generator
+            </button>
+          </div>
+
+          <!-- Log cards list -->
+          <div id="history-list" class="hidden flex flex-col gap-4">
+            <!-- Dynamic items inserted here -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- AUTH MODAL (Google Sign-In Only) -->
+    <div id="auth-modal" class="hidden modal-backdrop">
+      <div class="modal-content border border-zinc-800 p-6 flex flex-col gap-6">
+        
+        <!-- Header / Presentation -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-indigo-950 text-indigo-400 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-indigo-900/50">
+            <i class="fa-solid fa-user-shield text-indigo-400 animate-pulse"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white uppercase tracking-tight">Secure Sign In</h3>
+            <p class="text-indigo-400 text-[10px] uppercase tracking-widest font-bold">Google Auth Enabled</p>
+          </div>
+        </div>
+
+        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col gap-2.5">
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Create an account or log in instantly using your Google Account to claim 90 FREE credits and securely track your prompt generation history.
+          </p>
+        </div>
+
+        <!-- Google Sign-In Button (Visible) -->
+        <button type="button" onclick="handleGoogleSignIn()" class="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-800 transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]">
+          <i class="fa-brands fa-google text-red-500" style="color: #ea4335 !important;"></i>
+          <span>Continue with Google Account</span>
+        </button>
+
+        <button type="button" onclick="closeAuthModal()" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-800 transition-all cursor-pointer">
+          Cancel
+        </button>
+
+        <!-- Hidden Legacy Auth Form and Tab Buttons to avoid breaking JS scripts -->
+        <div class="hidden">
+          <button id="auth-tab-login"></button>
+          <button id="auth-tab-signup"></button>
+          <form id="auth-form" onsubmit="event.preventDefault()">
+            <div id="auth-field-username">
+              <input type="text" id="auth-input-username" />
+            </div>
+            <input type="email" id="auth-input-email" />
+            <input type="password" id="auth-input-password" />
+            <button type="submit" id="auth-submit-btn">Proceed</button>
+          </form>
+        </div>
+        <div id="auth-error-msg" class="text-xs text-rose-400 font-medium hidden"></div>
+      </div>
+    </div>
+
+    <!-- SANDBOX CHECKOUT MODAL -->
+    <div id="sandbox-checkout-modal" class="hidden modal-backdrop">
+      <div class="modal-content border border-zinc-800">
+        <div class="p-6 flex flex-col gap-5">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-emerald-950 text-emerald-400 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-emerald-900/30">
+              <i class="fa-solid fa-flask"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white uppercase tracking-tight">Razorpay Sandbox</h3>
+              <p class="text-emerald-400 text-[10px] uppercase tracking-widest font-bold">Simulator Active</p>
+            </div>
+          </div>
+
+          <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col gap-2.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-zinc-500">Item:</span>
+              <span id="sandbox-item-title" class="text-white font-semibold">50 Credits Pack</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-zinc-500">Price:</span>
+              <span id="sandbox-item-price" class="text-emerald-400 font-bold">$5.00</span>
+            </div>
+            <div class="h-[1px] bg-zinc-800/60 my-1"></div>
+            <p class="text-[11px] text-zinc-400 leading-relaxed">
+              Your public and private Razorpay API keys are not configured in your Environment Secrets. The simulator will verify the payment flow and credit your account.
+            </p>
+            <div class="p-3 bg-indigo-950/40 border border-indigo-900/30 rounded-xl text-[10px] text-indigo-300 leading-relaxed flex flex-col gap-1">
+              <span class="font-bold text-indigo-200">How to use your own Razorpay keys:</span>
+              <span>1. Go to Razorpay Dashboard &gt; Settings &gt; API Keys</span>
+              <span>2. Generate your Key ID and Key Secret</span>
+              <span>3. Add them in AI Studio Settings Secrets: <code class="bg-zinc-900 px-1 py-0.5 rounded text-white font-mono">RAZORPAY_KEY_ID</code> and <code class="bg-zinc-900 px-1 py-0.5 rounded text-white font-mono">RAZORPAY_KEY_SECRET</code></span>
+            </div>
+          </div>
+
+          <button id="sandbox-pay-btn" onclick="executeSandboxCheckout()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-circle-check text-xs"></i>
+            <span>Simulate Successful Payment</span>
+          </button>
+
+          <button type="button" onclick="closeSandboxCheckoutModal()" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-800 transition-all cursor-pointer">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING POPUP MODAL -->
+    <div id="pricing-popup-modal" class="hidden modal-backdrop">
+      <div class="modal-content border border-zinc-800 p-6 flex flex-col gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-indigo-950 text-indigo-400 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-indigo-900/50">
+            <i class="fa-solid fa-bolt text-emerald-500 animate-pulse"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white uppercase tracking-tight">Credits Exhausted</h3>
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest">Upgrade to Continue</p>
+          </div>
+        </div>
+
+        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col gap-2.5">
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Each high-density vision analysis costs <strong class="text-white">30 credits</strong>. You have used all of your free guest credits.
+          </p>
+          <div class="h-[1px] bg-zinc-800 my-1"></div>
+          <p class="text-xs text-emerald-400 font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-gift"></i> Log in or Sign up now to claim 90 FREE credits!
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <button onclick="openAuthModalFromPopup('login')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-right-to-bracket text-xs"></i>
+            <span>Log In to Get 90 Credits</span>
+          </button>
+          <button onclick="openAuthModalFromPopup('signup')" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-user-plus text-xs"></i>
+            <span>Create Free Account</span>
+          </button>
+          <button type="button" onclick="closePricingPopupModal()" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-wider rounded-xl border border-zinc-800 transition-all cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Toast Notification -->
+    <div id="error-toast" class="hidden fixed bottom-6 right-6 z-50 text-white border border-rose-800/50 px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 max-w-md transform translate-y-24 opacity-0 pointer-events-none transition-all duration-350 bg-zinc-900">
+      <div class="bg-rose-900/30 border border-rose-700/50 p-2 rounded-xl text-rose-400">
+        <i data-lucide="alert-circle" class="w-5 h-5" style="color: #f87171 !important;"></i>
+      </div>
+      <div class="flex-grow">
+        <p class="text-xs font-bold uppercase tracking-wider text-rose-400" style="color: #f87171 !important;">Alert</p>
+        <p id="error-message" class="text-xs text-zinc-400 mt-0.5">Could not process image</p>
+      </div>
+      <button type="button" id="close-toast" class="text-zinc-500 hover:text-zinc-200 transition-colors bg-transparent border-0 cursor-pointer">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Beautiful Responsive Footer -->
+    <footer class="bg-zinc-950 border-t border-zinc-900 pt-16 pb-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Main Footer Links and Logo row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-zinc-900">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showView('generator')">
+              <img src="https://geminipromptgenerator.online/blog/wp-content/uploads/2026/07/logo-2.webp" alt="Logo" class="h-8 w-auto object-contain" referrerPolicy="no-referrer" />
+              <span class="text-sm font-bold text-white uppercase tracking-tight">Gemini<span style="color: #25d366 !important;">Prompt</span></span>
+            </div>
+            <p class="text-zinc-500 text-xs leading-relaxed">
+              Synthesize production-grade text-to-image prompt code directly from high-density computer vision analysis models.
+            </p>
+          </div>
+
+          <!-- Section: Links -->
+          <div class="flex flex-col gap-3">
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Product</h4>
+            <ul class="flex flex-col gap-2 text-xs text-zinc-500">
+              <li><a onclick="showView('generator')" class="hover:text-white transition-colors cursor-pointer">Vision Generator</a></li>
+              <li><a onclick="showView('pricing')" class="hover:text-white transition-colors cursor-pointer">Credit Pricing</a></li>
+            </ul>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Resources</h4>
+            <ul class="flex flex-col gap-2 text-xs text-zinc-500">
+              <li><a onclick="showView('pricing')" class="hover:text-white transition-colors cursor-pointer">Purchase Credits</a></li>
+              <li><a onclick="openAuthModal('signup')" class="hover:text-white transition-colors cursor-pointer">Create Account</a></li>
+            </ul>
+          </div>
+
+          <!-- Section: Social & Support (WhatsApp Only!) -->
+          <div class="flex flex-col gap-4">
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Community Support</h4>
+            <div class="flex items-center gap-3">
+              <!-- ONLY add WhatsApp icon with this specific URL -->
+              <a href="https://whatsapp.com/channel/0029VbBdohQHltY7L6LJu703" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-zinc-900 hover:bg-emerald-600 border border-zinc-800 hover:border-emerald-500 flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-300 shadow-md" title="Join WhatsApp Channel">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+              </a>
+            </div>
+            <p class="text-[10px] text-zinc-600 uppercase tracking-wider font-mono">Join our official WhatsApp channel for real-time announcements.</p>
+          </div>
+        </div>
+
+        <!-- Bottom Copyright Row -->
+        <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-zinc-600 font-mono uppercase tracking-widest">
+          <div>&copy; 2026 GeminiPrompt Generator. All rights reserved.</div>
+          <div class="flex items-center gap-4">
+            <a onclick="showView('generator')" class="hover:text-zinc-400 transition-colors cursor-pointer">Home</a>
+            <span>&bull;</span>
+            <a onclick="showView('pricing')" class="hover:text-zinc-400 transition-colors cursor-pointer">Pricing</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Firebase Compat SDKs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-auth-compat.js"></script>
+
+    <script>
+      // Initialize vector icons
+      lucide.createIcons();
+
+      // State Management
+      let originalImageBase64 = null;
+      let originalMimeType = null;
+      let selectedModifiers = new Set();
+
+      // Firebase client global instance
+      auth = (typeof auth !== 'undefined') ? auth : null;
+      let firebaseInitError = null;
+
+      // Helper to load scripts dynamically
+      async function loadScript(url) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = url;
+          script.async = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+          document.head.appendChild(script);
+        });
+      }
+
+      // User & Navigation State
+      let currentUser = null;
+      let currentAuthTab = 'login';
+      let checkoutTarget = null; // { price, credits }
+
+      // DOM Elements Selection
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const browseBtn = document.getElementById('browse-btn');
+      const cropperWorkspace = document.getElementById('cropper-workspace');
+      const cropperImage = document.getElementById('cropper-image');
+      const imageStatusBadge = document.getElementById('image-status-badge');
+      const changeImageBtn = document.getElementById('change-image-btn');
+
+      // Generation Inputs
+      const promptStyleSelect = document.getElementById('prompt-style');
+      const customInstructionsInput = document.getElementById('custom-instructions');
+      const modifierButtons = document.querySelectorAll('.modifier-btn');
+      const clearModifiersBtn = document.getElementById('clear-modifiers-btn');
+      const generateBtn = document.getElementById('generate-btn');
+
+      // Outputs
+      const outputEmpty = document.getElementById('output-empty');
+      const outputLoading = document.getElementById('output-loading');
+      const outputDisplay = document.getElementById('output-display');
+      const generatedPromptText = document.getElementById('generated-prompt-text');
+      const promptStats = document.getElementById('prompt-stats');
+      const charCountSpan = document.getElementById('char-count');
+      const wordCountSpan = document.getElementById('word-count');
+      const copyBtn = document.getElementById('copy-btn');
+      const reGenerateBtn = document.getElementById('re-generate-btn');
+      const outputStateBadge = document.getElementById('output-state-badge');
+
+      // New DOM Elements for Navigation Views
+      const viewGenerator = document.getElementById('view-generator');
+      const viewPricing = document.getElementById('view-pricing');
+      const viewDashboard = document.getElementById('view-dashboard');
+      
+      const navGenerator = document.getElementById('nav-generator');
+      const navPricing = document.getElementById('nav-pricing');
+      const navDashboard = document.getElementById('nav-dashboard');
+      
+      // Header Auth Elements
+      const authLoggedOut = document.getElementById('auth-logged-out');
+      const authLoggedIn = document.getElementById('auth-logged-in');
+      const headerUserName = document.getElementById('header-user-name');
+      const headerCreditsCount = document.getElementById('header-credits-count');
+      
+      // Auth Modal Elements
+      const authModal = document.getElementById('auth-modal');
+      const authTabLogin = document.getElementById('auth-tab-login');
+      const authTabSignup = document.getElementById('auth-tab-signup');
+      const authForm = document.getElementById('auth-form');
+      const authFieldUsername = document.getElementById('auth-field-username');
+      const authInputUsername = document.getElementById('auth-input-username');
+      const authInputEmail = document.getElementById('auth-input-email');
+      const authInputPassword = document.getElementById('auth-input-password');
+      const authErrorMsg = document.getElementById('auth-error-msg');
+      const authSubmitBtn = document.getElementById('auth-submit-btn');
+      
+      // Checkout Modal Elements
+      const checkoutModal = document.getElementById('checkout-modal');
+      const checkoutItemTitle = document.getElementById('checkout-item-title');
+      const checkoutItemPrice = document.getElementById('checkout-item-price');
+      
+      // Dashboard Elements
+      const dashboardUsername = document.getElementById('dashboard-username');
+      const dashboardEmail = document.getElementById('dashboard-email');
+      const dashboardCredits = document.getElementById('dashboard-credits');
+      const historyEmpty = document.getElementById('history-empty');
+      const historyList = document.getElementById('history-list');
+      const historyCountBadge = document.getElementById('history-count-badge');
+
+      // Toast Notification Elements
+      const errorToast = document.getElementById('error-toast');
+      const errorMessage = document.getElementById('error-message');
+      const closeToastBtn = document.getElementById('close-toast');
+
+      // --- Drag & Drop Handlers ---
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('border-indigo-500', 'bg-indigo-950/10');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/10');
+        }, false);
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+          handleSelectedFile(files[0]);
+        }
+      });
+
+      browseBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          handleSelectedFile(e.target.files[0]);
+        }
+      });
+
+      changeImageBtn.addEventListener('click', () => {
+        // Reset states
+        originalImageBase64 = null;
+        originalMimeType = null;
+        cropperImage.src = "";
+        
+        // Toggle view visibility
+        cropperWorkspace.classList.add('hidden');
+        dropZone.classList.remove('hidden');
+        imageStatusBadge.classList.add('hidden');
+        
+        // Reset generate button state
+        updateGenerateButtonState();
+        fileInput.value = "";
+      });
+
+      // --- File Reading and Image Workspace Setup ---
+      function handleSelectedFile(file) {
+        if (!file.type.startsWith('image/')) {
+          showToast('Unsupported format', 'Please select a valid image file.');
+          return;
+        }
+
+        originalMimeType = file.type;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          originalImageBase64 = e.target.result;
+          
+          // Show the image workspace
+          dropZone.classList.add('hidden');
+          cropperWorkspace.classList.remove('hidden');
+          imageStatusBadge.classList.remove('hidden');
+          
+          // Setup Image
+          cropperImage.src = originalImageBase64;
+          
+          // Done loading
+          updateGenerateButtonState();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // --- Modifiers Selection ---
+      modifierButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const modifierText = btn.getAttribute('data-modifier');
+          
+          if (selectedModifiers.has(modifierText)) {
+            selectedModifiers.delete(modifierText);
+            btn.classList.remove('bg-indigo-950/60', 'text-indigo-400', 'border-indigo-500/50');
+            btn.classList.add('bg-zinc-800/60', 'text-zinc-400', 'border-zinc-800');
+          } else {
+            selectedModifiers.add(modifierText);
+            btn.classList.remove('bg-zinc-800/60', 'text-zinc-400', 'border-zinc-800');
+            btn.classList.add('bg-indigo-950/60', 'text-indigo-400', 'border-indigo-500/50');
+          }
+
+          updateCustomInstructionsText();
+        });
+      });
+
+      clearModifiersBtn.addEventListener('click', () => {
+        selectedModifiers.clear();
+        modifierButtons.forEach(btn => {
+          btn.classList.remove('bg-indigo-950/60', 'text-indigo-400', 'border-indigo-500/50');
+          btn.classList.add('bg-zinc-800/60', 'text-zinc-400', 'border-zinc-800');
+        });
+        customInstructionsInput.value = "";
+      });
+
+      function updateCustomInstructionsText() {
+        if (selectedModifiers.size === 0) {
+          customInstructionsInput.value = "";
+          return;
+        }
+        
+        const modifiersArray = Array.from(selectedModifiers);
+        customInstructionsInput.value = "Render style guidelines: " + modifiersArray.join(", ") + ".";
+      }
+
+      // --- Button Enabling State ---
+      function updateGenerateButtonState() {
+        if (originalImageBase64) {
+          generateBtn.disabled = false;
+          generateBtn.classList.remove('bg-zinc-800/40', 'text-zinc-700', 'cursor-not-allowed', 'border-zinc-800/60');
+          generateBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer', 'shadow-lg', 'border-indigo-500');
+        } else {
+          generateBtn.disabled = true;
+          generateBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'shadow-lg', 'border-indigo-500');
+          generateBtn.classList.add('bg-zinc-800/40', 'text-zinc-700', 'cursor-not-allowed', 'border-zinc-800/60');
+        }
+      }
+
+      // --- Prompt Copy Feature ---
+      copyBtn.addEventListener('click', async () => {
+        const textToCopy = generatedPromptText.textContent;
+        if (!textToCopy) return;
+
+        try {
+          // Strip quotes out for copying if they wrap it
+          let cleanCopyText = textToCopy;
+          if (cleanCopyText.startsWith('"') && cleanCopyText.endsWith('"')) {
+            cleanCopyText = cleanCopyText.slice(1, -1);
+          }
+
+          await navigator.clipboard.writeText(cleanCopyText);
+          
+          // Temporary Visual feedback on Copy
+          const originalHTML = copyBtn.innerHTML;
+          copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Copied!</span>`;
+          copyBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
+          copyBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+          lucide.createIcons();
+
+          setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+            copyBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+            copyBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+            lucide.createIcons();
+          }, 2000);
+        } catch (err) {
+          showToast('Failed to copy', 'Could not copy the text automatically.');
+        }
+      });
+
+      // --- Gemini Prompt Generation Trigger ---
+      generateBtn.addEventListener('click', generatePrompt);
+      reGenerateBtn.addEventListener('click', generatePrompt);
+
+      async function generatePrompt() {
+        if (!originalImageBase64) return;
+
+        // Perform Credit Check
+        if (currentUser) {
+          if (currentUser.credits < 30) {
+            openPricingPopupModal();
+            return;
+          }
+        } else {
+          const anonCredits = getAnonymousCredits();
+          if (anonCredits < 30) {
+            openPricingPopupModal();
+            return;
+          }
+        }
+
+        // Visual state: Loading
+        setLoadingState(true);
+
+        try {
+          let finalBase64Image = originalImageBase64;
+
+          let response;
+          const headers = {
+            'Content-Type': 'application/json',
+          };
+          const token = getSessionToken();
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+
+          try {
+            const apiEndpoint = getApiUrl('/api/generate-prompt');
+            response = await fetch(apiEndpoint, {
+              method: 'POST',
+              headers: headers,
+              body: JSON.stringify({
+                image: finalBase64Image,
+                mimeType: originalMimeType || 'image/jpeg',
+                promptType: promptStyleSelect.value,
+                customInstructions: customInstructionsInput.value
+              })
+            });
+
+            if (response.status === 404 && apiEndpoint.startsWith('/api/')) {
+              console.warn("Relative API returned 404, attempting live Vercel fallback...");
+              throw new Error("API_404");
+            }
+          } catch (fetchErr) {
+            if (fetchErr.message === "API_404" || fetchErr instanceof TypeError) {
+              const fallbackHeaders = {
+                'Content-Type': 'application/json',
+              };
+              if (token) {
+                fallbackHeaders['Authorization'] = `Bearer ${token}`;
+              }
+              // Fallback to the live Vercel beta URL
+              response = await fetch('https://gemini-prompt-generator-beta.vercel.app/api/generate-prompt', {
+                method: 'POST',
+                headers: fallbackHeaders,
+                body: JSON.stringify({
+                  image: finalBase64Image,
+                  mimeType: originalMimeType || 'image/jpeg',
+                  promptType: promptStyleSelect.value,
+                  customInstructions: customInstructionsInput.value
+                })
+              });
+            } else {
+              throw fetchErr;
+            }
+          }
+
+          if (!response.ok) {
+            const errData = await response.json();
+            if (response.status === 403 || errData.error === 'credits_exhausted') {
+              openPricingPopupModal();
+              setLoadingState(false);
+              return;
+            }
+            throw new Error(errData.error || `HTTP error ${response.status}`);
+          }
+
+          const data = await response.json();
+          displayGeneratedPrompt(data.prompt);
+          
+          if (currentUser && typeof data.credits === 'number') {
+            currentUser.credits = data.credits;
+            checkAuthMe(); // Refresh prompt history and credits dynamically
+          } else if (!currentUser) {
+            // Deduct 30 credits locally for guest
+            const currentAnon = getAnonymousCredits();
+            const nextAnon = Math.max(0, currentAnon - 30);
+            setAnonymousCredits(nextAnon);
+          }
+
+        } catch (error) {
+          console.error("Failed to generate prompt:", error);
+          showToast('Prompt Generation Failed', error.message || 'Gemini encountered an issue analyzing the image.');
+          setLoadingState(false);
+        }
+      }
+
+      function setLoadingState(isLoading) {
+        if (isLoading) {
+          // Disable interactive elements
+          generateBtn.disabled = true;
+          generateBtn.innerHTML = `<span class="inline-block w-4 h-4 rounded-full bg-slate-400 animate-spin border-2 border-white border-t-transparent mr-2"></span>Generating...`;
+          reGenerateBtn.disabled = true;
+          
+          // Toggle output box visual states
+          outputEmpty.classList.add('hidden');
+          outputDisplay.classList.add('hidden');
+          outputLoading.classList.remove('hidden');
+          promptStats.classList.add('hidden');
+
+          // Update state badge
+          outputStateBadge.textContent = "Analyzing...";
+          outputStateBadge.className = "px-2 py-0.5 bg-indigo-950 border border-indigo-900 text-indigo-400 text-[9px] font-bold uppercase tracking-wider rounded-full animate-pulse";
+        } else {
+          updateGenerateButtonState();
+          generateBtn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 mr-2"></i>Generate Prompt`;
+          reGenerateBtn.disabled = false;
+          lucide.createIcons();
+        }
+      }
+
+      function displayGeneratedPrompt(promptText) {
+        // Clear loading state visuals
+        setLoadingState(false);
+        outputLoading.classList.add('hidden');
+        
+        // Set values and configure stats (with clean layout quotes for visuals)
+        generatedPromptText.textContent = `"${promptText.trim()}"`;
+        
+        // Count chars and words
+        const trimmed = promptText.trim();
+        const charCount = trimmed.length;
+        const wordCount = trimmed === "" ? 0 : trimmed.split(/\s+/).length;
+        
+        charCountSpan.textContent = `${charCount} chars`;
+        wordCountSpan.textContent = `${wordCount} words`;
+
+        // Reveal layout
+        outputDisplay.classList.remove('hidden');
+        promptStats.classList.remove('hidden');
+
+        // Update state badge
+        outputStateBadge.textContent = "Ready to use";
+        outputStateBadge.className = "px-2 py-0.5 bg-emerald-950 border border-emerald-900 text-emerald-400 text-[9px] font-bold uppercase tracking-wider rounded-full";
+
+        // Scroll layout to read response smoothly on mobile
+        document.getElementById('output-container').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // --- Toast Notification Helpers ---
+      let toastTimeout = null;
+      function showToast(title, description) {
+        // Set messaging
+        errorToast.querySelector('p.text-rose-400').textContent = title;
+        errorMessage.textContent = description;
+
+        // Bring animation in
+        errorToast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+        errorToast.classList.add('translate-y-0', 'opacity-100');
+
+        // Automatic dismiss after 5s
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(hideToast, 5000);
+      }
+
+      function hideToast() {
+        errorToast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+        errorToast.classList.remove('translate-y-0', 'opacity-100');
+      }
+
+      closeToastBtn.addEventListener('click', hideToast);
+
+      // --- Session Token Management ---
+      function getSessionToken() {
+        return localStorage.getItem('auth_token');
+      }
+      function setSessionToken(token) {
+        if (token) {
+          localStorage.setItem('auth_token', token);
+        } else {
+          localStorage.removeItem('auth_token');
+        }
+      }
+
+      // --- View Management ---
+      function showView(viewName) {
+        // Hide all views
+        viewGenerator.classList.add('hidden');
+        viewPricing.classList.add('hidden');
+        viewDashboard.classList.add('hidden');
+        
+        // Deactivate all nav links
+        navGenerator.classList.remove('active');
+        navPricing.classList.remove('active');
+        navDashboard.classList.remove('active');
+        
+        if (viewName === 'generator') {
+          viewGenerator.classList.remove('hidden');
+          navGenerator.classList.add('active');
+          try {
+            window.history.replaceState(null, '', window.location.pathname + '#generator');
+          } catch (e) {}
+        } else if (viewName === 'pricing') {
+          viewPricing.classList.remove('hidden');
+          navPricing.classList.add('active');
+          try {
+            window.history.replaceState(null, '', window.location.pathname + '#pricing');
+          } catch (e) {}
+        } else if (viewName === 'dashboard') {
+          if (!currentUser) {
+            openAuthModal('login');
+            // Select home / generator tab
+            viewGenerator.classList.remove('hidden');
+            navGenerator.classList.add('active');
+            try {
+              window.history.replaceState(null, '', window.location.pathname + '#generator');
+            } catch (e) {}
+            return;
+          }
+          viewDashboard.classList.remove('hidden');
+          navDashboard.classList.add('active');
+          renderPromptHistory();
+          try {
+            window.history.replaceState(null, '', window.location.pathname + '#dashboard');
+          } catch (e) {}
+        }
+      }
+
+      // --- Auth Modal Control ---
+      function openAuthModal(tab = 'login') {
+        authModal.classList.remove('hidden');
+        switchAuthTab(tab);
+      }
+      
+      function closeAuthModal() {
+        authModal.classList.add('hidden');
+        authForm.reset();
+        authErrorMsg.classList.add('hidden');
+      }
+      
+      function switchAuthTab(tab) {
+        currentAuthTab = tab;
+        authErrorMsg.classList.add('hidden');
+        
+        if (tab === 'login') {
+          authTabLogin.className = "flex-1 py-4 text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-500 text-white cursor-pointer";
+          authTabSignup.className = "flex-1 py-4 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 cursor-pointer";
+          authFieldUsername.classList.add('hidden');
+          authInputUsername.removeAttribute('required');
+          authSubmitBtn.textContent = "Log In";
+        } else {
+          authTabSignup.className = "flex-1 py-4 text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-500 text-white cursor-pointer";
+          authTabLogin.className = "flex-1 py-4 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 cursor-pointer";
+          authFieldUsername.classList.remove('hidden');
+          authInputUsername.setAttribute('required', 'required');
+          authSubmitBtn.textContent = "Create Account";
+        }
+      }
+
+      // --- Helper to resolve API paths based on host environment ---
+      function getApiUrl(path) {
+        // Since we are running a full-stack application, the frontend and Express backend
+        // are always hosted on the same origin. Returning a relative path is 100% reliable
+        // and completely avoids cross-origin CORS blocks or "Failed to fetch" errors.
+        return path;
+      }
+
+      // --- Firebase Auth & Initialization ---
+      async function initFirebase() {
+        try {
+          firebaseInitError = null;
+          
+          // Fallback loading mechanism if static script tag fails (e.g. Brave Shields / Content Blockers)
+          if (typeof firebase === 'undefined') {
+            console.log("Firebase is not loaded yet. Attempting dynamic script load with failover CDNs...");
+            const cdns = [
+              {
+                app: "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js",
+                auth: "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"
+              },
+              {
+                app: "https://cdn.jsdelivr.net/npm/firebase@10.8.0/firebase-app-compat.js",
+                auth: "https://cdn.jsdelivr.net/npm/firebase@10.8.0/firebase-auth-compat.js"
+              },
+              {
+                app: "https://unpkg.com/firebase@10.8.0/firebase-app-compat.js",
+                auth: "https://unpkg.com/firebase@10.8.0/firebase-auth-compat.js"
+              }
+            ];
+
+            let loaded = false;
+            for (const cdn of cdns) {
+              try {
+                await loadScript(cdn.app);
+                await loadScript(cdn.auth);
+                if (typeof firebase !== 'undefined') {
+                  loaded = true;
+                  console.log(`Successfully loaded Firebase from CDN: ${cdn.app}`);
+                  break;
+                }
+              } catch (e) {
+                console.warn(`Could not load Firebase from ${cdn.app}, trying next...`, e);
+              }
+            }
+
+            if (!loaded) {
+              throw new Error("Firebase SDK script failed to load from all CDNs. This is typically caused by an adblocker, Brave Shields, or content-blocking browser extensions. Please disable Shields/adblockers for this site and refresh.");
+            }
+          }
+
+          // Use static configuration directly to support static HTML environments cleanly
+          const config = {
+            projectId: "gen-lang-client-0844549707",
+            appId: "1:845800015860:web:a6229be704605991785ba1",
+            apiKey: "AIzaSyCFyGzp7viV1tq25DAMnpKKSJpPngtVa14",
+            authDomain: "gen-lang-client-0844549707.firebaseapp.com",
+            firestoreDatabaseId: "ai-studio-imagetogeminipro-7991f626-f4c5-4d1c-8e24-82965df261a7",
+            storageBucket: "gen-lang-client-0844549707.firebasestorage.app",
+            messagingSenderId: "845800015860"
+          };
+
+          let appInstance;
+          if (firebase.apps.length === 0) {
+            appInstance = firebase.initializeApp(config);
+          } else {
+            appInstance = firebase.app();
+          }
+          auth = firebase.auth();
+          
+          // Listen to firebase auth state changes and wait for initial resolution
+          await new Promise((resolve) => {
+            let initialCheckDone = false;
+            auth.onAuthStateChanged(async (user) => {
+              try {
+                if (user) {
+                  const idToken = await user.getIdToken();
+                  setSessionToken(idToken);
+                  await checkAuthMe();
+                } else {
+                  // If user is null, they might have signed in using custom email/password
+                  // So we check if there is an existing session token, and try to verify it first.
+                  const existingToken = getSessionToken();
+                  if (existingToken) {
+                    await checkAuthMe();
+                  }
+                  
+                  // If we still don't have a currentUser, then clear everything
+                  if (!currentUser) {
+                    setSessionToken(null);
+                    currentUser = null;
+                    updateUserUI();
+                  }
+                }
+              } catch (e) {
+                console.error("Error in onAuthStateChanged handler:", e);
+              } finally {
+                if (!initialCheckDone) {
+                  initialCheckDone = true;
+                  resolve();
+                }
+              }
+            });
+          });
+        } catch (err) {
+          console.error("Firebase initialization failed:", err);
+          firebaseInitError = err.message || "Firebase initialization failed.";
+          authErrorMsg.textContent = firebaseInitError;
+          authErrorMsg.classList.remove('hidden');
+        }
+      }
+
+      // --- Auth Forms Submission Handlers ---
+      async function handleAuthSubmit(event) {
+        event.preventDefault();
+        authErrorMsg.classList.add('hidden');
+        
+        const email = authInputEmail.value.trim();
+        const password = authInputPassword.value;
+        const username = authInputUsername.value.trim();
+        
+        try {
+          authSubmitBtn.disabled = true;
+          authSubmitBtn.innerHTML = `<span class="inline-block w-4 h-4 rounded-full bg-slate-400 animate-spin border-2 border-white border-t-transparent mr-2"></span>Processing...`;
+          
+          if (currentAuthTab === 'signup') {
+            const res = await fetch(getApiUrl('/api/auth/custom-signup'), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || "Signup failed.");
+            }
+            setSessionToken(data.token);
+            await checkAuthMe();
+            closeAuthModal();
+            showToast('Authentication Successful', `Welcome, ${username}!`);
+            showView('generator');
+          } else {
+            const res = await fetch(getApiUrl('/api/auth/custom-login'), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || "Login failed.");
+            }
+            setSessionToken(data.token);
+            await checkAuthMe();
+            closeAuthModal();
+            showToast('Authentication Successful', `Welcome back, ${data.user.username || 'User'}!`);
+            showView('generator');
+          }
+          
+        } catch (err) {
+          authErrorMsg.textContent = err.message || "Authentication failed. Please check your credentials.";
+          authErrorMsg.classList.remove('hidden');
+        } finally {
+          authSubmitBtn.disabled = false;
+          authSubmitBtn.textContent = currentAuthTab === 'signup' ? 'Create Account' : 'Log In';
+        }
+      }
+
+      // --- Google Sign-In Handler ---
+      async function signInWithGoogle() {
+        authErrorMsg.classList.add('hidden');
+        try {
+          if (!auth) {
+            throw new Error("Firebase Authentication is not initialized yet. Please wait or refresh the page.");
+          }
+          const provider = new firebase.auth.GoogleAuthProvider();
+          provider.addScope('profile');
+          provider.addScope('email');
+          
+          showToast('Google Auth', 'Opening Google Sign-In...');
+          const result = await auth.signInWithPopup(provider);
+          const user = result.user;
+          if (user) {
+            const idToken = await user.getIdToken();
+            setSessionToken(idToken);
+            await checkAuthMe();
+            closeAuthModal();
+            showToast('Authentication Successful', `Welcome, ${user.displayName || user.email}!`);
+            showView('generator');
+          }
+        } catch (err) {
+          console.error("Google Sign-In failed:", err);
+          authErrorMsg.textContent = err.message || "Google Sign-In failed.";
+          authErrorMsg.classList.remove('hidden');
+          showToast('Auth Failed', err.message || 'Google login failed.');
+        }
+      }
+
+      window.signInWithGoogle = signInWithGoogle;
+
+      function handleGoogleSignIn() {
+        signInWithGoogle();
+      }
+
+      // --- Log Out Handler ---
+      async function handleLogout() {
+        if (auth) {
+          try {
+            await auth.signOut();
+          } catch(err) {
+            console.error("Firebase logout failed:", err);
+          }
+        }
+        setSessionToken(null);
+        currentUser = null;
+        updateUserUI();
+        showView('generator');
+        showToast('Logged Out', 'You have been signed out successfully.');
+      }
+
+      // --- Check Session on load ---
+      async function checkAuthMe() {
+        const token = getSessionToken();
+        if (!token) {
+          currentUser = null;
+          updateUserUI();
+          return;
+        }
+        try {
+          const res = await fetch(getApiUrl('/api/auth/me'), {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            currentUser = data.user;
+          } else {
+            // Token is invalid/expired
+            if (auth) {
+              await auth.signOut();
+            }
+            setSessionToken(null);
+            currentUser = null;
+          }
+        } catch(err) {
+          console.error("Me check failed:", err);
+          currentUser = null;
+        }
+        updateUserUI();
+      }
+
+      // --- Anonymous & Pricing Modal Storage Helpers ---
+      function getAnonymousCredits() {
+        const val = localStorage.getItem('anon_credits');
+        if (val === null) {
+          localStorage.setItem('anon_credits', '60');
+          return 60;
+        }
+        return parseInt(val, 10);
+      }
+
+      function setAnonymousCredits(val) {
+        localStorage.setItem('anon_credits', val.toString());
+        updateUserUI();
+      }
+
+      window.openPricingPopupModal = function() {
+        const modal = document.getElementById('pricing-popup-modal');
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      window.closePricingPopupModal = function() {
+        const modal = document.getElementById('pricing-popup-modal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      window.openAuthModalFromPopup = function(tab) {
+        closePricingPopupModal();
+        openAuthModal(tab);
+      }
+
+      // --- Update Header and Dashboard UI with Current User state ---
+      function updateUserUI() {
+        const mobUserName = document.getElementById('mobile-header-user-name');
+        const mobCreditsCount = document.getElementById('mobile-header-credits-count');
+        const mobNavDashboard = document.getElementById('mobile-nav-dashboard');
+        const mobAuthLoggedOut = document.getElementById('mobile-auth-logged-out');
+        const mobAuthLoggedIn = document.getElementById('mobile-auth-logged-in');
+
+        const genCreditsDisplay = document.getElementById('generator-credits-display');
+        const creditsVal = currentUser ? currentUser.credits : getAnonymousCredits();
+        if (genCreditsDisplay) {
+          genCreditsDisplay.textContent = creditsVal;
+        }
+
+        if (currentUser) {
+          authLoggedOut.classList.add('hidden');
+          authLoggedIn.classList.remove('hidden');
+          headerUserName.textContent = currentUser.username;
+          headerCreditsCount.textContent = currentUser.credits;
+          navDashboard.classList.remove('hidden');
+
+          if (mobUserName) mobUserName.textContent = currentUser.username;
+          if (mobCreditsCount) mobCreditsCount.textContent = currentUser.credits;
+          if (mobNavDashboard) mobNavDashboard.classList.remove('hidden');
+          if (mobAuthLoggedOut) mobAuthLoggedOut.classList.add('hidden');
+          if (mobAuthLoggedIn) mobAuthLoggedIn.classList.remove('hidden');
+          
+          // Dashboard page mapping
+          dashboardUsername.textContent = currentUser.username;
+          dashboardEmail.textContent = currentUser.email;
+          dashboardCredits.textContent = currentUser.credits;
+          
+          renderPromptHistory();
+        } else {
+          authLoggedOut.classList.remove('hidden');
+          authLoggedIn.classList.add('hidden');
+          navDashboard.classList.add('hidden');
+
+          if (mobNavDashboard) mobNavDashboard.classList.add('hidden');
+          if (mobAuthLoggedOut) mobAuthLoggedOut.classList.remove('hidden');
+          if (mobAuthLoggedIn) mobAuthLoggedIn.classList.add('hidden');
+        }
+      }
+
+      // --- Helper to format timestamps ---
+      function formatTimestamp(isoString) {
+        try {
+          const date = new Date(isoString);
+          return date.toLocaleString();
+        } catch(e) {
+          return isoString;
+        }
+      }
+
+      // --- Render Prompt History on Dashboard ---
+      function renderPromptHistory() {
+        if (!currentUser || !currentUser.promptHistory || currentUser.promptHistory.length === 0) {
+          historyEmpty.classList.remove('hidden');
+          historyList.classList.add('hidden');
+          historyCountBadge.textContent = "0 prompts";
+          return;
+        }
+        
+        historyEmpty.classList.add('hidden');
+        historyList.classList.remove('hidden');
+        historyCountBadge.textContent = `${currentUser.promptHistory.length} prompt${currentUser.promptHistory.length > 1 ? 's' : ''}`;
+        
+        historyList.innerHTML = currentUser.promptHistory.map((item, index) => {
+          const styleName = item.promptType || item.style || "Standard";
+          const instructionText = item.customInstructions || item.instructions || "";
+          const promptText = item.generatedPrompt || item.prompt || "";
+          const itemId = item.id || `hist-${index}`;
+          
+          return `
+            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 flex flex-col gap-3 relative hover:border-zinc-700 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-[9px] font-bold text-indigo-400 uppercase tracking-wider font-mono">${styleName}</span>
+                  <span class="text-[10px] text-zinc-500 font-mono">${formatTimestamp(item.timestamp)}</span>
+                </div>
+                <button onclick="copyHistoryPrompt('${itemId}', ${index})" class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 flex items-center gap-1 bg-transparent border-0 cursor-pointer" id="copy-history-${itemId}">
+                  <i class="fa-solid fa-copy text-[10px]"></i> Copy
+                </button>
+              </div>
+              
+              ${instructionText ? `
+                <div class="text-xs text-zinc-500 font-mono italic">
+                  <span class="text-zinc-600">Guideline:</span> ${instructionText}
+                </div>
+              ` : ''}
+
+              <p class="text-sm text-zinc-300 italic font-medium font-sans leading-relaxed">"${promptText}"</p>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // --- Copy prompt from history list ---
+      window.copyHistoryPrompt = async function(id, index) {
+        if (!currentUser || !currentUser.promptHistory) return;
+        const item = currentUser.promptHistory[index] || currentUser.promptHistory.find(h => h.id === id);
+        if (!item) return;
+        const promptText = item.generatedPrompt || item.prompt || "";
+        
+        try {
+          await navigator.clipboard.writeText(promptText);
+          const btn = document.getElementById(`copy-history-${id}`);
+          if (btn) {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i> Copied!`;
+            btn.classList.add('text-emerald-400');
+            btn.classList.remove('text-indigo-400');
+            
+            setTimeout(() => {
+              btn.innerHTML = originalHTML;
+              btn.classList.remove('text-emerald-400');
+              btn.classList.add('text-indigo-400');
+            }, 2000);
+          }
+        } catch(e) {
+          showToast('Failed to copy', 'Clipboard write error.');
+        }
+      }
+
+      let sandboxTarget = null; // { price, credits, currency, orderId }
+
+      window.startRazorpayCheckout = async function(price, credits, currency = 'USD') {
+        if (!currentUser) {
+          openAuthModal('signup');
+          showToast('Sign Up Required', 'Please create an account to purchase credits.');
+          return;
+        }
+
+        try {
+          showToast('Processing', 'Contacting secure payment gateway...');
+          const token = getSessionToken();
+          
+          // 1. Fetch Razorpay configuration first to see if sandbox mode is active
+          const configRes = await fetch(getApiUrl('/api/payment/razorpay-config'));
+          const configData = await configRes.json();
+          
+          // 2. Create the order on the backend
+          const orderRes = await fetch(getApiUrl('/api/payment/create-order'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ amount: price, credits: credits, currency: currency })
+          });
+          
+          const orderData = await orderRes.json();
+          if (!orderRes.ok) {
+            throw new Error(orderData.error || 'Failed to initialize payment order');
+          }
+
+          if (orderData.isSandbox) {
+            // Show custom Sandbox helper modal
+            sandboxTarget = { price, credits, currency, orderId: orderData.orderId };
+            document.getElementById('sandbox-item-title').textContent = `${credits} Prompt Credits Pack`;
+            document.getElementById('sandbox-item-price').textContent = currency === 'INR' ? `₹${price}` : `$${price.toFixed(2)}`;
+            document.getElementById('sandbox-checkout-modal').classList.remove('hidden');
+            return;
+          }
+
+          // 3. Launch Real Razorpay Checkout!
+          const options = {
+            key: configData.keyId,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "GeminiPrompt Generator",
+            description: `${credits} Credits Pack`,
+            image: "https://unpkg.com/lucide-static@0.330.0/icons/sparkles.png",
+            order_id: orderData.orderId,
+            handler: function (response) {
+              verifyRazorpayPaymentOnBackend(response, credits, false);
+            },
+            prefill: {
+              name: currentUser.username,
+              email: currentUser.email
+            },
+            theme: {
+              color: "#6366f1" // indigo primary
+            }
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+
+        } catch (err) {
+          showToast('Payment Error', err.message || 'Failed to start checkout');
+        }
+      }
+
+      window.closeSandboxCheckoutModal = function() {
+        document.getElementById('sandbox-checkout-modal').classList.add('hidden');
+        sandboxTarget = null;
+      }
+
+      window.executeSandboxCheckout = async function() {
+        if (!sandboxTarget) return;
+        const payBtn = document.getElementById('sandbox-pay-btn');
+        const originalText = payBtn.innerHTML;
+        
+        try {
+          payBtn.disabled = true;
+          payBtn.innerHTML = `<span class="inline-block w-4 h-4 rounded-full bg-slate-400 animate-spin border-2 border-white border-t-transparent mr-2"></span>Simulating callback...`;
+          
+          const dummyResponse = {
+            razorpay_order_id: sandboxTarget.orderId,
+            razorpay_payment_id: "pay_sim_" + Math.random().toString(36).substring(2, 12),
+            razorpay_signature: "signature_sim_verified"
+          };
+          
+          await verifyRazorpayPaymentOnBackend(dummyResponse, sandboxTarget.credits, true);
+          closeSandboxCheckoutModal();
+        } catch (err) {
+          showToast('Sandbox Verification Failed', err.message);
+        } finally {
+          payBtn.disabled = false;
+          payBtn.innerHTML = originalText;
+        }
+      }
+
+      async function verifyRazorpayPaymentOnBackend(response, credits, isSandbox) {
+        const token = getSessionToken();
+        try {
+          showToast('Verifying', 'Securing payment ledger...');
+          
+          const verifyRes = await fetch(getApiUrl('/api/payment/verify'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              credits: credits,
+              isSandbox: isSandbox
+            })
+          });
+
+          const data = await verifyRes.json();
+          if (!verifyRes.ok) {
+            throw new Error(data.error || 'Signature validation failed');
+          }
+
+          currentUser.credits = data.credits;
+          currentUser.promptHistory = data.promptHistory;
+          updateUserUI();
+          showToast('Payment Completed', `Success! Credited ${data.added} prompt generations.`);
+          showView('dashboard');
+        } catch (err) {
+          showToast('Verification Failed', err.message || 'Failed to verify transaction signature');
+          throw err;
+        }
+      }
+
+      window.handleFreeStarterSignup = function() {
+        if (currentUser) {
+          showToast('Active Account Found', 'You already have an active account!');
+          showView('generator');
+        } else {
+          openAuthModal('signup');
+        }
+      }
+
+      // Expose to window context for HTML onclick attributes
+      window.showView = showView;
+      window.openAuthModal = openAuthModal;
+      window.closeAuthModal = closeAuthModal;
+      window.switchAuthTab = switchAuthTab;
+      window.handleAuthSubmit = handleAuthSubmit;
+      window.handleLogout = handleLogout;
+
+      // --- Light Mode Switcher ---
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isLight = html.classList.toggle('light-mode');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        updateThemeToggleBtnIcon();
+      }
+
+      function updateThemeToggleBtnIcon() {
+        const isLight = document.documentElement.classList.contains('light-mode');
+        const themeBtn = document.getElementById('theme-toggle-btn');
+        if (themeBtn) {
+          themeBtn.innerHTML = isLight 
+            ? `<i class="fa-solid fa-sun text-xs"></i>`
+            : `<i class="fa-solid fa-moon text-xs"></i>`;
+        }
+      }
+
+      // Initialize theme on load
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-mode');
+      } else {
+        document.documentElement.classList.remove('light-mode');
+      }
+      setTimeout(updateThemeToggleBtnIcon, 50);
+
+      // --- Mobile Menu Toggle ---
+      function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-dropdown-menu');
+        const isHidden = menu.classList.toggle('hidden');
+        const toggleBtn = document.getElementById('mobile-menu-toggle-btn');
+        if (toggleBtn) {
+          toggleBtn.innerHTML = isHidden
+            ? `<i class="fa-solid fa-bars text-sm"></i>`
+            : `<i class="fa-solid fa-xmark text-sm"></i>`;
+        }
+      }
+
+      window.toggleTheme = toggleTheme;
+      window.toggleMobileMenu = toggleMobileMenu;
+
+      // Run profile loader and Firebase initialization on page start
+      initFirebase().then(() => {
+        const path = window.location.pathname;
+        const hash = window.location.hash;
+        if (path.includes('dashboard.html') || path.includes('dashboard') || hash.includes('dashboard')) {
+          showView('dashboard');
+        } else if (path.includes('pricing') || hash.includes('pricing')) {
+          showView('pricing');
+        } else {
+          showView('generator');
+        }
+      });
+
+      // Handle browser back/forward navigation using URL hashes
+      window.addEventListener('hashchange', () => {
+        const hash = window.location.hash;
+        if (hash.includes('dashboard')) {
+          showView('dashboard');
+        } else if (hash.includes('pricing')) {
+          showView('pricing');
+        } else {
+          showView('generator');
+        }
+      });
+    </script>
+  </body>
+</html>

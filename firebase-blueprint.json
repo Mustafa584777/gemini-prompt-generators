@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with credits and history",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "credits": { "type": "number" },
+        "passwordHash": { "type": "string" },
+        "promptHistory": { "type": "array" }
+      },
+      "required": ["username", "email", "credits"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles collection"
+    }
+  }
+}
